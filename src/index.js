@@ -160,11 +160,15 @@ export class OverView extends SampleBase {
             }
         }
     }
+
     onDataBound() {
-        clearTimeout(this.clrIntervalFun);
-        clearInterval(this.intervalFun);
+        /* Might be useless*/
+        // console.log(this.clrIntervalFun)
+        // clearTimeout(this.clrIntervalFun);
+        // clearInterval(this.intervalFun);
         this.dtTime = true;
     }
+
     onComplete(args) {
         if (args.requestType === "filterchoicerequest") {
             if (args.filterModel.options.field === "Trustworthiness" || args.filterModel.options.field === "Rating" || args.filterModel.options.field === "Status") {

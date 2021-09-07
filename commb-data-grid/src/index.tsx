@@ -1,4 +1,4 @@
-import { render } from 'react-dom';
+import ReactDOM from 'react-dom';
 import './index.css';
 import React from 'react';
 import { closest, isNullOrUndefined } from '@syncfusion/ej2-base';
@@ -119,9 +119,60 @@ const statusdetails = (props:any): JSX.Element|void => {
     }
 }
 
-export class OverView extends SampleBase {
+interface IDataNavigate{
+    text: string
+    value: string
+}
+
+interface ITradeData{
+    check: boolean;
+    EmployeeID: number;
+    Employees: string;
+    Designation: string;
+    Location: string;
+    Status: string;
+    Trustworthiness: string;
+    Rating: number;
+    Software: number;
+    EmployeeImg: string;
+    CurrentSalary: number;
+    Address: string;
+}
+
+interface ITypeBox{
+    type:string
+}
+
+interface ISelectBox extends ITypeBox{
+    persistSelection: boolean,
+    checkboxOnly: boolean
+}
+
+interface ITypeBoxTemplate extends ITypeBox{
+    itemTemplate: any //For Now it will be any
+}
+
+
+
+export class OverView extends SampleBase  {
+
+    dReady: boolean;
+    dtTime: boolean;
+    isDataBound: boolean;
+    isDataChanged: boolean;
+    dropSlectedIndex: null | number;
+    ddlData: IDataNavigate[];
+    fields: IDataNavigate;
+    getTradeData: ITradeData[];
+    check: ITypeBox;
+    select: ISelectBox;
+    Filter: ITypeBox;
+    status: ITypeBoxTemplate
+    trust: ITypeBoxTemplate
+    rating: ITypeBoxTemplate
+    
     constructor() {
-        super(...arguments);
+        super([...arguments]);
         this.dReady = false;
         this.dtTime = false;
         this.isDataBound = false;
@@ -158,7 +209,8 @@ export class OverView extends SampleBase {
             itemTemplate: ratingDetails
         };
     }
-    onQueryCellInfo(args) {
+
+    onQueryCellInfo(args:any): void {
         if (args.column.field === 'Employees') {
             if (args.data.EmployeeImg === 'usermale') {
                 args.cell.querySelector('.e-userimg').classList.add("sf-icon-Male");
@@ -197,12 +249,14 @@ export class OverView extends SampleBase {
     }
 
     onDataBound() {
-        clearTimeout(this.clrIntervalFun);
-        clearInterval(this.intervalFun);
+        /* Might be useless*/
+        // console.log(this.clrIntervalFun)
+        // clearTimeout(this.clrIntervalFun);
+        // clearInterval(this.intervalFun);
         this.dtTime = true;
     }
 
-    onComplete(args) {
+    onComplete(args:any) {
         if (args.requestType === "filterchoicerequest") {
             if (args.filterModel.options.field === "Trustworthiness" || args.filterModel.options.field === "Rating" || args.filterModel.options.field === "Status") {
                 var span = args.filterModel.dialogObj.element.querySelectorAll('.e-selectall')[0];
@@ -214,6 +268,7 @@ export class OverView extends SampleBase {
     }
 
     onChange() {
+        console.log(this.ddObj)
         this.ddObj.hidePopup();
         this.gridInstance.showSpinner();
         this.dropSlectedIndex = null;
@@ -259,7 +314,23 @@ export class OverView extends SampleBase {
         <span id='msg'></span>
         <br />
         </div>
-          <GridComponent id="overviewgrid" dataSource={this.getTradeData} enableHover={false} enableVirtualization={true} rowHeight={38} height='600' ref={(g) => { this.gridInstance = g; }} actionComplete={this.onComplete.bind(this)} load={this.onLoad.bind(this)} queryCellInfo={this.onQueryCellInfo.bind(this)} dataBound={this.onDataBound.bind(this)} filterSettings={this.Filter} allowFiltering={true} allowSorting={true} allowSelection={true} selectionSettings={this.select}>
+          <GridComponent 
+            id="overviewgrid" 
+            dataSource={this.getTradeData} 
+            enableHover={false} 
+            enableVirtualization={true} 
+            rowHeight={38} height='600' 
+            ref={(g) => { this.gridInstance = g; }} 
+            actionComplete={this.onComplete.bind(this)} 
+            load={this.onLoad.bind(this)} 
+            queryCellInfo={this.onQueryCellInfo.bind(this)} 
+            dataBound={this.onDataBound.bind(this)} 
+            filterSettings={this.Filter} 
+            allowFiltering={true} 
+            allowSorting={true} 
+            allowSelection={true} 
+            selectionSettings={this.select}>
+
             <ColumnsDirective>
             <ColumnDirective type='checkbox' allowSorting={false} allowFiltering={false} width='60'></ColumnDirective>
               <ColumnDirective field='EmployeeID' visible={false} headerText='Employee ID' isPrimaryKey={true} width='130'></ColumnDirective>
@@ -285,4 +356,4 @@ export class OverView extends SampleBase {
     }
 }
 
-render(<OverView />, document.getElementById('data-grid'));
+ReactDOM.render(<OverView />, document.getElementById('data-grid'));
