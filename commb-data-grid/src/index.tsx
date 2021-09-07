@@ -1,11 +1,15 @@
-import ReactDOM from 'react-dom';
-import './index.css';
-import React from 'react';
-import { closest, isNullOrUndefined } from '@syncfusion/ej2-base';
-import { GridComponent, ColumnsDirective, ColumnDirective, Filter, Inject, VirtualScroll, Sort } from '@syncfusion/ej2-react-grids';
-import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
+import * as ReactDOM from 'react-dom';
+import * as React from 'react';
+import { classList, Animation, createElement, closest, isNullOrUndefined } from '@syncfusion/ej2-base';
+import { GridComponent, ColumnsDirective, ColumnDirective,Filter, IFilter,Inject,Grid, VirtualScroll, Sort,SelectionType, Selection  } from '@syncfusion/ej2-react-grids';
+import {DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
+import { CheckBox  } from '@syncfusion/ej2-react-buttons';
+// import { orderDetails } from './data';
 import { SampleBase } from './sample-base';
+import { Slider } from '@syncfusion/ej2-react-inputs';
+import { Query, DataManager, Predicate } from '@syncfusion/ej2-data';
 import { getData } from './data';
+import './index.css';
 
 // Interfaces
 interface ILoc {
@@ -13,8 +17,11 @@ interface ILoc {
     height:string
 }
 
+interface IDataNavigate{
+    [key:string]: Object
+}
 
-const statusTemplate = (props:any): JSX.Element => {
+const statusTemplate = (props:any): any => {
     return (
         <div id="status" className="statustemp">
             <span className="statustxt">{props.Status}</span>
@@ -22,7 +29,7 @@ const statusTemplate = (props:any): JSX.Element => {
     )
 }
 
-const ratingTemplate = (props:any): JSX.Element => {
+const ratingTemplate = (props:any): any => {
     return (
             <div className="rating">
             <span className="star"></span>
@@ -34,7 +41,7 @@ const ratingTemplate = (props:any): JSX.Element => {
         );
 }
 
-const progessTemplate = (props:any): JSX.Element => {
+const progessTemplate = (props:any): any => {
     return (
             <div id="myProgress" className="pbar">
             <div id="myBar" className="bar">
@@ -44,9 +51,9 @@ const progessTemplate = (props:any): JSX.Element => {
             );
 }
 
-let loc:ILoc = { width: '31px', height: '24px' };
+let loc = { width: '31px' , height: '24px'};
 
-const trustTemplate = (props:any): JSX.Element => {
+const trustTemplate = (props:any): any => {
     var Trustworthiness = props.Trustworthiness == "Sufficient" ? 'https://ej2.syncfusion.com/react/demos/src/grid/images/Sufficient.png' : props.Trustworthiness == "Insufficient" ? 'src/grid/images/Insufficient.png' : 'src/grid/images/Perfect.png';
     return (
         <> 
@@ -55,7 +62,7 @@ const trustTemplate = (props:any): JSX.Element => {
         </>);
 }
 
-const empTemplate = (props:any): JSX.Element => {
+const empTemplate = (props:any): any => {
     return (<div>
       <div className="empimg">
         <span className="e-userimg">
@@ -65,7 +72,7 @@ const empTemplate = (props:any): JSX.Element => {
     </div>);
 }
 
-const coltemplate = (props:any): JSX.Element => {
+const coltemplate = (props:any): any => {
     return (
         <div className="Mapimage"><img src="https://ej2.syncfusion.com/react/demos/src/grid/images/Map.png" className="e-image"/> <span>  </span> 
             <span id="locationtext">{props.Location}</span>
@@ -73,7 +80,7 @@ const coltemplate = (props:any): JSX.Element => {
         );
 }
 
-const trustdetails = (props:any): JSX.Element => {
+const trustdetails = (props:any): any => {
     if (props.Trustworthiness === "Select All") {
         return <span></span>
     }
@@ -89,12 +96,11 @@ const trustdetails = (props:any): JSX.Element => {
             );
 }
 
-const ratingDetails = (props:any): JSX.Element => {
+const ratingDetails = (props:any): any => {
     let ele:JSX.Element[] = [];
     for (var i = 0; i < 5; i++) {
         if (i < props.Rating) {
             ele.push(<span className="star checked"></span>);
-            continue
         }
         else {
             ele.push(<span className="star"></span>);
@@ -103,7 +109,7 @@ const ratingDetails = (props:any): JSX.Element => {
     return <div className="rating">{ele}</div>;
 }
 
-const statusdetails = (props:any): JSX.Element|void => {
+const statusdetails = (props:any): any => {
     if (props.Status === "Select All") {
         return (<span>Select All</span>);
     }
@@ -119,103 +125,36 @@ const statusdetails = (props:any): JSX.Element|void => {
     }
 }
 
-interface IDataNavigate{
-    text: string
-    value: string
-}
+export class OverView extends SampleBase { 
+  public dReady: boolean = false;
+  private dtTime: boolean = false;
+  private isDataBound: boolean = false;
+  public isDataChanged: boolean = true;
 
-interface ITradeData{
-    check: boolean;
-    EmployeeID: number;
-    Employees: string;
-    Designation: string;
-    Location: string;
-    Status: string;
-    Trustworthiness: string;
-    Rating: number;
-    Software: number;
-    EmployeeImg: string;
-    CurrentSalary: number;
-    Address: string;
-}
+  private intervalFun: any;
+  private clrIntervalFun: any;
+  private clrIntervalFun1: any;
+  private clrIntervalFun2: any;
 
-interface ITypeBox{
-    type:string
-}
+  public dropSlectedIndex: null | number = null;
+  public ddObj: DropDownListComponent;
+  public gridInstance: GridComponent;
 
-interface ISelectBox extends ITypeBox{
-    persistSelection: boolean,
-    checkboxOnly: boolean
-}
+  public stTime: any; 
 
-interface ITypeBoxTemplate extends ITypeBox{
-    itemTemplate: any //For Now it will be any
-}
-
-
-
-export class OverView extends SampleBase  {
-
-    dReady: boolean;
-    dtTime: boolean;
-    isDataBound: boolean;
-    isDataChanged: boolean;
-    dropSlectedIndex: null | number;
-    ddlData: IDataNavigate[];
-    fields: IDataNavigate;
-    getTradeData: ITradeData[];
-    check: ITypeBox;
-    select: ISelectBox;
-    Filter: ITypeBox;
-    status: ITypeBoxTemplate
-    trust: ITypeBoxTemplate
-    rating: ITypeBoxTemplate
-    
-    constructor() {
-        super([...arguments]);
-        this.dReady = false;
-        this.dtTime = false;
-        this.isDataBound = false;
-        this.isDataChanged = true;
-        this.dropSlectedIndex = null;
-        this.ddlData = [
-            { text: '1,000 Rows and 11 Columns', value: '1000' },
-            { text: '10,000 Rows and 11 Columns', value: '10000' },
-            { text: '1,00,000 Rows and 11 Columns', value: '100000' }
-        ];
-        this.fields = { text: 'text', value: 'value' };
-        this.getTradeData = getData(1000);
-        this.check = {
-            type: 'CheckBox'
-        };
-        this.select = {
-            persistSelection: true,
-            type: "Multiple",
-            checkboxOnly: true
-        };
-        this.Filter = {
-            type: 'Menu'
-        };
-        this.status = {
-            type: 'CheckBox',
-            itemTemplate: statusdetails
-        };
-        this.trust = {
-            type: 'CheckBox',
-            itemTemplate: trustdetails
-        };
-        this.rating = {
-            type: 'CheckBox',
-            itemTemplate: ratingDetails
-        };
-    }
-
-    onQueryCellInfo(args:any): void {
-        if (args.column.field === 'Employees') {
+  private ddlData: IDataNavigate[] = [
+    { text: '1,000 Rows and 11 Columns', value: '1000' },
+    { text: '10,000 Rows and 11 Columns', value: '10000' },
+    { text: '1,00,000 Rows and 11 Columns', value: '100000' }      
+  ];
+ 
+  private fields: IDataNavigate = { text: 'text', value: 'value' };
+ 
+  public onQueryCellInfo(args:any): void {
+       if (args.column.field === 'Employees') {
             if (args.data.EmployeeImg === 'usermale') {
                 args.cell.querySelector('.e-userimg').classList.add("sf-icon-Male");
-            }
-            else {
+            } else {
                 args.cell.querySelector('.e-userimg').classList.add("sf-icon-FeMale");
             }
         }
@@ -241,119 +180,136 @@ export class OverView extends SampleBase  {
                 args.data.Software = args.data.Software + 30;
             }
             args.cell.querySelector(".bar").style.width = args.data.Software + "%";
-            args.cell.querySelector(".barlabel").textContent = args.data.Software + "%";
+            args.cell.querySelector(".barlabel").textContent = args.data.Software + "%";           
             if (args.data.Status === "Inactive") {
                 args.cell.querySelector(".bar").classList.add("progressdisable");
             }
-        }
-    }
+        }    
+  }
 
-    onDataBound() {
-        /* Might be useless*/
-        // console.log(this.clrIntervalFun)
-        // clearTimeout(this.clrIntervalFun);
-        // clearInterval(this.intervalFun);
-        this.dtTime = true;
-    }
+  public onDataBound(): void {
+    clearTimeout(this.clrIntervalFun);
+    clearInterval(this.intervalFun);
+    this.dtTime = true;
+  }
 
-    onComplete(args:any) {
-        if (args.requestType === "filterchoicerequest") {
-            if (args.filterModel.options.field === "Trustworthiness" || args.filterModel.options.field === "Rating" || args.filterModel.options.field === "Status") {
-                var span = args.filterModel.dialogObj.element.querySelectorAll('.e-selectall')[0];
-                if (!isNullOrUndefined(span)) {
-                    closest(span, '.e-ftrchk').classList.add("e-hide");
-                }
+  public onComplete(args:any): void{
+    if (args.requestType === "filterchoicerequest") {
+        if (args.filterModel.options.field === "Trustworthiness" || args.filterModel.options.field === "Rating" || args.filterModel.options.field === "Status") {
+            var span = args.filterModel.dialogObj.element.querySelectorAll('.e-selectall')[0];
+            if(!isNullOrUndefined(span)) {
+                closest(span, '.e-ftrchk').classList.add("e-hide");
             }
         }
     }
+  } 
 
-    onChange() {
-        console.log(this.ddObj)
-        this.ddObj.hidePopup();
-        this.gridInstance.showSpinner();
-        this.dropSlectedIndex = null;
-        let index = this.ddObj.value;
-        clearTimeout(this.clrIntervalFun2);
-        this.clrIntervalFun2 = setTimeout(() => {
-            this.isDataChanged = true;
-            this.stTime = null;
-            let contentElement = this.gridInstance.contentModule.getPanel().firstChild;
-            contentElement.scrollLeft = 0;
-            contentElement.scrollTop = 0;
-            this.gridInstance.pageSettings.currentPage = 1;
-            this.stTime = performance.now();
-            this.gridInstance.dataSource = getData(index);
-            this.gridInstance.hideSpinner();
-        }, 100);
-    }
+  public getTradeData: Object = getData(1000); 
 
-    onLoad(args) {
-        document.getElementById('overviewgrid').ej2_instances[0].on('data-ready', () => {
-            this.dReady = true;
+  public onChange(): void {
+
+	this.ddObj.hidePopup();
+    this.gridInstance.showSpinner();
+    this.dropSlectedIndex = null;
+    let index: number = this.ddObj.value as number;
+    clearTimeout(this.clrIntervalFun2);
+
+    this.clrIntervalFun2 = setTimeout(() => {
+        this.isDataChanged = true;
+        this.stTime = null;
+        let contentElement: Element = this.gridInstance.contentModule.getPanel().firstChild as Element;
+        contentElement.scrollLeft = 0;
+        contentElement.scrollTop = 0;
+        this.gridInstance.pageSettings.currentPage = 1;
+        this.stTime = performance.now();
+        this.gridInstance.dataSource = getData(index);
+        this.gridInstance.hideSpinner();
+    }, 100);
+  }
+
+  public check : IFilter = {
+    type: 'CheckBox'
+  }
+
+  public select : any = {
+      persistSelection: true,
+      type: "Multiple",
+      checkboxOnly: true
+  }
+
+  public onLoad(args:any): void { 
+      let overview_grid:any = document.getElementById('overviewgrid')
+      overview_grid.ej2_instances[0].on('data-ready', ()=> {
+            this.dReady = true; 
             this.stTime = performance.now();
         });
-        document.getElementById('overviewgrid').addEventListener('DOMSubtreeModified', () => {
-            if (this.dReady && this.stTime && this.isDataChanged) {
-                let msgEle = document.getElementById('msg');
-                let val = (performance.now() - this.stTime).toFixed(0);
-                this.stTime = null;
-                this.dReady = false;
-                this.dtTime = false;
-                this.isDataChanged = false;
-                msgEle.innerHTML = 'Load Time: ' + "<b>" + val + "</b>" + '<b>ms</b>';
-                msgEle.classList.remove('e-hide');
-            }
-        });
+        
+    overview_grid.addEventListener('DOMSubtreeModified', () => {
+    if (this.dReady && this.stTime && this.isDataChanged) {
+        let msgEle:any = document.getElementById('msg');
+        console.log(msgEle)
+        let val: any = (performance.now() - this.stTime).toFixed(0);
+        this.stTime = null;
+        this.dReady = false;
+        this.dtTime = false;
+        this.isDataChanged = false;
+        msgEle.innerHTML = 'Load Time: ' + "<b>" + val + "</b>" + '<b>ms</b>';
+        msgEle.classList.remove('e-hide')
     }
+    })
+}
 
-    render() {
-        return (<div className='control-pane'>
+  public Filter : any = {
+    type: 'Menu'
+  }   
+
+  public status : any = {
+    type: 'CheckBox',
+    itemTemplate: statusdetails
+  }    
+
+  public trust : any = {
+    type: 'CheckBox',
+    itemTemplate: trustdetails
+  }   
+
+  public rating : any = {
+    type: 'CheckBox',
+    itemTemplate: ratingDetails
+  }    
+
+  render() {    
+    return (
+      <div className='control-pane'>
         <div className='control-section'>
         <div>
-        <DropDownListComponent id="games" width='220' dataSource={this.ddlData} index={0} ref={(dropdownlist) => { this.ddObj = dropdownlist; }} fields={this.fields} change={this.onChange.bind(this)} placeholder="Select a Data Range" popupHeight="240px"/>
-        <span id='msg'></span>
-        <br />
+            <DropDownListComponent id="games" width='220' dataSource={this.ddlData} index={0} ref={(dropdownlist) => { this.ddObj = dropdownlist }} fields={this.fields} change={this.onChange.bind(this)} placeholder="Select a Data Range" popupHeight="240px" />
+            <span id='msg'></span>
+            <br/>
         </div>
-          <GridComponent 
-            id="overviewgrid" 
-            dataSource={this.getTradeData} 
-            enableHover={false} 
-            enableVirtualization={true} 
-            rowHeight={38} height='600' 
-            ref={(g) => { this.gridInstance = g; }} 
-            actionComplete={this.onComplete.bind(this)} 
-            load={this.onLoad.bind(this)} 
-            queryCellInfo={this.onQueryCellInfo.bind(this)} 
-            dataBound={this.onDataBound.bind(this)} 
-            filterSettings={this.Filter} 
-            allowFiltering={true} 
-            allowSorting={true} 
-            allowSelection={true} 
-            selectionSettings={this.select}>
-
+          <GridComponent id="overviewgrid" dataSource={this.getTradeData} enableHover={false} enableVirtualization={true} rowHeight={38} height='600' ref={(g) => { this.gridInstance = g }} actionComplete={this.onComplete.bind(this)} load={this.onLoad.bind(this)} queryCellInfo={this.onQueryCellInfo.bind(this)} dataBound={this.onDataBound.bind(this)} filterSettings={this.Filter} allowFiltering={true} allowSorting={true} allowSelection={true} selectionSettings={this.select} >
             <ColumnsDirective>
-            <ColumnDirective type='checkbox' allowSorting={false} allowFiltering={false} width='60'></ColumnDirective>
+            <ColumnDirective type='checkbox' allowSorting={false} allowFiltering={false}  width='60'></ColumnDirective>
               <ColumnDirective field='EmployeeID' visible={false} headerText='Employee ID' isPrimaryKey={true} width='130'></ColumnDirective>
-              <ColumnDirective field='Employees' headerText='Employee Name' width='230' clipMode='EllipsisWithTooltip' template={empTemplate} filter={this.check}/>
-              <ColumnDirective field='Designation' headerText='Designation' width='170' filter={this.check} clipMode='EllipsisWithTooltip'/>
+              <ColumnDirective field='Employees' headerText='Employee Name' width='230'clipMode='EllipsisWithTooltip' template={empTemplate} filter={this.check} />
+              <ColumnDirective field='Designation'  headerText='Designation' width='170' filter={this.check} clipMode='EllipsisWithTooltip' />
               <ColumnDirective field='Mail' headerText='Mail' filter={this.Filter} width='230'></ColumnDirective>
               <ColumnDirective field='Location' headerText='Location' width='140' filter={this.check} template={coltemplate}></ColumnDirective>
-              <ColumnDirective field='Status' headerText='Status' filter={this.status} template={statusTemplate} width='130'></ColumnDirective>
+              <ColumnDirective field='Status' headerText='Status' filter={this.status}  template={statusTemplate} width='130'></ColumnDirective>
               <ColumnDirective field='Trustworthiness' filter={this.trust} headerText='Trustworthiness' template={trustTemplate} width='160'></ColumnDirective>
-              <ColumnDirective field='Rating' headerText='Rating' filter={this.rating} template={ratingTemplate} width='160'/>
-              <ColumnDirective field='Software' allowFiltering={false} allowSorting={false} headerText='Software Proficiency' width='180' template={progessTemplate} format='C2'/>
+              <ColumnDirective field='Rating' headerText='Rating' filter={this.rating}  template={ratingTemplate} width='160' />
+              <ColumnDirective field='Software' allowFiltering={false} allowSorting={false} headerText='Software Proficiency' width='180' template={progessTemplate} format='C2' />
               <ColumnDirective field='CurrentSalary' headerText='Current Salary' filter={this.Filter} width='160' format='C2'></ColumnDirective>
-              <ColumnDirective field='Address' headerText='Address' width='240' filter={this.Filter} clipMode="EllipsisWithTooltip"></ColumnDirective>
+              <ColumnDirective field='Address' headerText='Address' width='240' filter={this.Filter} clipMode="EllipsisWithTooltip" ></ColumnDirective>
             </ColumnsDirective>
-            <Inject services={[Filter, VirtualScroll, Sort]}/>
+            <Inject services={[Filter,VirtualScroll,Sort]} />
           </GridComponent>
         </div>  
         <style>
             @import 'src/grid/Grid/style.css';
         </style>
 
-</div>);
-    }
+</div>
+    )
+  }
 }
-
-ReactDOM.render(<OverView />, document.getElementById('data-grid'));
