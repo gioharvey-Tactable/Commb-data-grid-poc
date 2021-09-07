@@ -19974,6 +19974,7 @@ export function getData(dataCount) {
     }
     return tradeData;
 }
+
 // exports.getData = getData;
 // exports.virtualData = [];
 // function datasource() {
