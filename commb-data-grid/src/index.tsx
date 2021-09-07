@@ -4,22 +4,18 @@ import { classList, Animation, createElement, closest, isNullOrUndefined } from 
 import { GridComponent, ColumnsDirective, ColumnDirective,Filter, IFilter,Inject,Grid, VirtualScroll, Sort,SelectionType, Selection  } from '@syncfusion/ej2-react-grids';
 import {DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
 import { CheckBox  } from '@syncfusion/ej2-react-buttons';
-// import { orderDetails } from './data';
 import { SampleBase } from './sample-base';
 import { Slider } from '@syncfusion/ej2-react-inputs';
 import { Query, DataManager, Predicate } from '@syncfusion/ej2-data';
+
+// The Data
 import { getData } from './data';
+
+// Interface
+import { ILoc, IDataNavigate } from './interfaces/data-grid_interface'
+
+// CSS
 import './index.css';
-
-// Interfaces
-interface ILoc {
-    width:string,
-    height:string
-}
-
-interface IDataNavigate{
-    [key:string]: Object
-}
 
 const statusTemplate = (props:any): any => {
     return (
@@ -126,6 +122,9 @@ const statusdetails = (props:any): any => {
 }
 
 export class OverView extends SampleBase { 
+
+  /* Will need to rewrite in Function Based Component */
+
   public dReady: boolean = false;
   private dtTime: boolean = false;
   private isDataBound: boolean = false;
@@ -283,11 +282,11 @@ export class OverView extends SampleBase {
       <div className='control-pane'>
         <div className='control-section'>
         <div>
-            <DropDownListComponent id="games" width='220' dataSource={this.ddlData} index={0} ref={(dropdownlist) => { this.ddObj = dropdownlist }} fields={this.fields} change={this.onChange.bind(this)} placeholder="Select a Data Range" popupHeight="240px" />
+            <DropDownListComponent id="games" width='220' dataSource={this.ddlData} index={0} ref={(dropdownlist:any) => { this.ddObj = dropdownlist }} fields={this.fields} change={this.onChange.bind(this)} placeholder="Select a Data Range" popupHeight="240px" />
             <span id='msg'></span>
             <br/>
         </div>
-          <GridComponent id="overviewgrid" dataSource={this.getTradeData} enableHover={false} enableVirtualization={true} rowHeight={38} height='600' ref={(g) => { this.gridInstance = g }} actionComplete={this.onComplete.bind(this)} load={this.onLoad.bind(this)} queryCellInfo={this.onQueryCellInfo.bind(this)} dataBound={this.onDataBound.bind(this)} filterSettings={this.Filter} allowFiltering={true} allowSorting={true} allowSelection={true} selectionSettings={this.select} >
+          <GridComponent id="overviewgrid" dataSource={this.getTradeData} enableHover={false} enableVirtualization={true} rowHeight={38} height='600' ref={(g:any) => { this.gridInstance = g }} actionComplete={this.onComplete.bind(this)} load={this.onLoad.bind(this)} queryCellInfo={this.onQueryCellInfo.bind(this)} dataBound={this.onDataBound.bind(this)} filterSettings={this.Filter} allowFiltering={true} allowSorting={true} allowSelection={true} selectionSettings={this.select} >
             <ColumnsDirective>
             <ColumnDirective type='checkbox' allowSorting={false} allowFiltering={false}  width='60'></ColumnDirective>
               <ColumnDirective field='EmployeeID' visible={false} headerText='Employee ID' isPrimaryKey={true} width='130'></ColumnDirective>
@@ -313,3 +312,5 @@ export class OverView extends SampleBase {
     )
   }
 }
+
+ReactDOM.render(<OverView />, document.getElementById('data-grid'));
