@@ -23,6 +23,5 @@
     "isolatedModules": true
   },
   "include": [
-    "src"
-, "old_file/original.tsx"  ]
+    "src"  ]
 }
