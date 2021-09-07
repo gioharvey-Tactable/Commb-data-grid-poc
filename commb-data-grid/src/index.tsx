@@ -5,7 +5,7 @@ import { closest, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { GridComponent, ColumnsDirective, ColumnDirective, Filter, Inject, VirtualScroll, Sort } from '@syncfusion/ej2-react-grids';
 import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
 import { SampleBase } from './sample-base';
-import { getData } from './data';
+import { getData } from './data.ts';
 
 // Interfaces
 interface ILoc {
@@ -14,16 +14,15 @@ interface ILoc {
 }
 
 
-
 const statusTemplate = (props:any): JSX.Element => {
     return (
         <div id="status" className="statustemp">
             <span className="statustxt">{props.Status}</span>
         </div>
-    );
+    )
 }
 
-const ratingTemplate = (props:any) => {
+const ratingTemplate = (props:any): JSX.Element => {
     return (
             <div className="rating">
             <span className="star"></span>
@@ -35,7 +34,7 @@ const ratingTemplate = (props:any) => {
         );
 }
 
-const progessTemplate = (props:any) => {
+const progessTemplate = (props:any): JSX.Element => {
     return (
             <div id="myProgress" className="pbar">
             <div id="myBar" className="bar">
@@ -47,7 +46,7 @@ const progessTemplate = (props:any) => {
 
 let loc:ILoc = { width: '31px', height: '24px' };
 
-const trustTemplate = (props:any) => {
+const trustTemplate = (props:any): JSX.Element => {
     var Trustworthiness = props.Trustworthiness == "Sufficient" ? 'https://ej2.syncfusion.com/react/demos/src/grid/images/Sufficient.png' : props.Trustworthiness == "Insufficient" ? 'src/grid/images/Insufficient.png' : 'src/grid/images/Perfect.png';
     return (
         <> 
@@ -56,7 +55,7 @@ const trustTemplate = (props:any) => {
         </>);
 }
 
-const empTemplate = (props:any) => {
+const empTemplate = (props:any): JSX.Element => {
     return (<div>
       <div className="empimg">
         <span className="e-userimg">
@@ -66,26 +65,36 @@ const empTemplate = (props:any) => {
     </div>);
 }
 
-const coltemplate = (props) => {
+const coltemplate = (props:any): JSX.Element => {
     return (
         <div className="Mapimage"><img src="https://ej2.syncfusion.com/react/demos/src/grid/images/Map.png" className="e-image"/> <span>  </span> 
-  <span id="locationtext">{props.Location}</span>
-</div>);
-}
-function trustdetails(props) {
-    if (props.Trustworthiness === "Select All") {
-        return (<span></span>);
-    }
-    let loc = { width: '31px', height: '24px' };
-    let Trustworthiness = props.Trustworthiness == "Sufficient" ? 'https://ej2.syncfusion.com/react/demos/src/grid/images/Sufficient.png' : props.Trustworthiness == "Insufficient" ? 'src/grid/images/Insufficient.png' : 'src/grid/images/Perfect.png';
-    return (<div><img style={loc} src={Trustworthiness}/> <span id="Trusttext">{props.Trustworthiness}</span></div>);
+            <span id="locationtext">{props.Location}</span>
+        </div>
+        );
 }
 
-function ratingDetails(props) {
-    let ele = [];
+const trustdetails = (props:any): JSX.Element => {
+    if (props.Trustworthiness === "Select All") {
+        return <span></span>
+    }
+
+    let loc:ILoc = { width: '31px', height: '24px' };
+
+    let Trustworthiness:string = props.Trustworthiness == "Sufficient" ? 'https://ej2.syncfusion.com/react/demos/src/grid/images/Sufficient.png' : props.Trustworthiness == "Insufficient" ? 'src/grid/images/Insufficient.png' : 'src/grid/images/Perfect.png';
+    return (
+            <>
+                <img style={loc} src={Trustworthiness}/> 
+                <span id="Trusttext">{props.Trustworthiness}</span>
+            </>
+            );
+}
+
+const ratingDetails = (props:any): JSX.Element => {
+    let ele:JSX.Element[] = [];
     for (var i = 0; i < 5; i++) {
         if (i < props.Rating) {
             ele.push(<span className="star checked"></span>);
+            continue
         }
         else {
             ele.push(<span className="star"></span>);
@@ -94,13 +103,13 @@ function ratingDetails(props) {
     return <div className="rating">{ele}</div>;
 }
 
-function statusdetails(props) {
+const statusdetails = (props:any): JSX.Element|void => {
     if (props.Status === "Select All") {
         return (<span>Select All</span>);
     }
     if (props.Status === "Active") {
         return (<div className="statustemp e-activecolor">
-            <span className="statustxt e-activecolor">Active</span>
+                <span className="statustxt e-activecolor">Active</span>
             </div>);
     }
     if (props.Status === "Inactive") {
