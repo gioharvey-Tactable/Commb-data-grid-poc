@@ -7,39 +7,56 @@ import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
 import { SampleBase } from './sample-base';
 import { getData } from './data';
 
-function statusTemplate(props) {
-    return (<div id="status" className="statustemp">
-  <span className="statustxt">{props.Status}</span>
-</div>);
+// Interfaces
+interface ILoc {
+    width:string,
+    height:string
 }
 
-function ratingTemplate(props) {
-    return (<div className="rating">
-            <span className="star"></span>
-            <span className="star"></span>
-            <span className="star"></span>
-            <span className="star"></span>
-            <span className="star"></span>
-        </div>);
+
+
+const statusTemplate = (props:any): JSX.Element => {
+    return (
+        <div id="status" className="statustemp">
+            <span className="statustxt">{props.Status}</span>
+        </div>
+    );
 }
 
-function progessTemplate(props) {
-    return (<div id="myProgress" className="pbar">
-  <div id="myBar" className="bar">
-    <div id="label" className="barlabel"></div>
-  </div>
-</div>);
+const ratingTemplate = (props:any) => {
+    return (
+            <div className="rating">
+            <span className="star"></span>
+            <span className="star"></span>
+            <span className="star"></span>
+            <span className="star"></span>
+            <span className="star"></span>
+            </div>
+        );
 }
 
-let loc = { width: '31px', height: '24px' };
+const progessTemplate = (props:any) => {
+    return (
+            <div id="myProgress" className="pbar">
+            <div id="myBar" className="bar">
+                <div id="label" className="barlabel"></div>
+            </div>
+            </div>
+            );
+}
 
-function trustTemplate(props) {
+let loc:ILoc = { width: '31px', height: '24px' };
+
+const trustTemplate = (props:any) => {
     var Trustworthiness = props.Trustworthiness == "Sufficient" ? 'https://ej2.syncfusion.com/react/demos/src/grid/images/Sufficient.png' : props.Trustworthiness == "Insufficient" ? 'src/grid/images/Insufficient.png' : 'src/grid/images/Perfect.png';
-    return (<div> <img style={loc} src={Trustworthiness}/>
-  <span id="Trusttext">{props.Trustworthiness}</span></div>);
+    return (
+        <> 
+            <img style={loc} src={Trustworthiness}/>
+            <span id="Trusttext">{props.Trustworthiness}</span>
+        </>);
 }
 
-function empTemplate(props) {
+const empTemplate = (props:any) => {
     return (<div>
       <div className="empimg">
         <span className="e-userimg">
@@ -49,9 +66,9 @@ function empTemplate(props) {
     </div>);
 }
 
-function coltemplate(props) {
-    return (<div className="Mapimage">
-  <img src="https://ej2.syncfusion.com/react/demos/src/grid/images/Map.png" className="e-image"/> <span>  </span> 
+const coltemplate = (props) => {
+    return (
+        <div className="Mapimage"><img src="https://ej2.syncfusion.com/react/demos/src/grid/images/Map.png" className="e-image"/> <span>  </span> 
   <span id="locationtext">{props.Location}</span>
 </div>);
 }
@@ -224,7 +241,7 @@ export class OverView extends SampleBase {
             }
         });
     }
-    
+
     render() {
         return (<div className='control-pane'>
         <div className='control-section'>
