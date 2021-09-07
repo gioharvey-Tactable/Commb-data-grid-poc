@@ -5,7 +5,7 @@ import { closest, isNullOrUndefined } from '@syncfusion/ej2-base';
 import { GridComponent, ColumnsDirective, ColumnDirective, Filter, Inject, VirtualScroll, Sort } from '@syncfusion/ej2-react-grids';
 import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
 import { SampleBase } from './sample-base';
-import { getData } from './data.ts';
+import { getData } from './data';
 
 // Interfaces
 interface ILoc {
